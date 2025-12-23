@@ -18,6 +18,7 @@ import (
 
 func init() {
 	RegisterLanguage(NewGoLanguage())
+	RegisterLanguage(NewAmibaGolang())
 }
 
 var (

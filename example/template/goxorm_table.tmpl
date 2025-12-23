@@ -11,6 +11,7 @@ import (
 
 {{- range .Tables }}
 type {{ TableMapper .Name }} struct {
+orm.Model `xorm:"-"`
 {{- $table := . }}
 {{- range $table.Table.ColumnsSeq }}
     {{- $col := $table.Table.GetColumn . }}

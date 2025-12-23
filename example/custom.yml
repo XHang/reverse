@@ -5,7 +5,7 @@ source:
   conn_str: root:xxxx@(abc:333)/17zwd_agency_warehouse?charset=utf8
 targets:
 - type: codes
-  language: golang
+  language: AmibaGolang
   include_tables:
     - asynchronous_task
   exclude_tables:
