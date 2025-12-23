@@ -1,20 +1,26 @@
-package models
+package model
 
 {{$ilen := len .Imports}}
 {{if gt $ilen 0}}
 import (
-	{{range .Imports}}"{{.}}"{{end}}
+    {{range .Imports}}"{{.}}"{{end}}
 )
 {{end}}
 
 {{range .Tables}}
 type {{TableMapper .Name}} struct {
 {{$table := .}}
-{{range .ColumnsSeq}}{{$col := $table.GetColumn .}}	{{ColumnMapper $col.Name}}	{{Type $col}} `{{Tag $table $col}}`
+{{range $table.Table.ColumnsSeq}}
+    {{$col := $table.Table.GetColumn .}} {{ColumnMapper $col.Name}} {{Type $col}} `{{Tag $table.Table $col}}`
 {{end}}
 }
 
 func (m *{{TableMapper .Name}}) TableName() string {
-	return "{{$table.Name}}"
+    return "{{$table.Table.Name}}"
+}
+
+// DatabaseAlias 数据库别名
+func (m *{{TableMapper .Name}}) DatabaseAlias() string {
+    return "{{$table.DataBase}}"
 }
 {{end}}

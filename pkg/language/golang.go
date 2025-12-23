@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"go/format"
 	"html/template"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -105,6 +106,9 @@ func (g *GoLanguage) BindTarget(target *conf.ReverseTarget) {
 }
 
 func (g *GoLanguage) TypeString(col *schemas.Column) string {
+	if g.IsBigInt(col) {
+		return "uint64"
+	}
 	st := col.SQLType
 	t := schemas.SQLType2Type(st)
 	s := t.String()
@@ -112,6 +116,25 @@ func (g *GoLanguage) TypeString(col *schemas.Column) string {
 		return "[]byte"
 	}
 	return s
+}
+func (g *GoLanguage) IsBigInt(col *schemas.Column) bool {
+	st := col.SQLType
+	t := schemas.SQLType2Type(st)
+	if IsNumericType(t) {
+		return strings.Contains(col.FieldName, "Id") || strings.Contains(col.FieldName, "id") || strings.Contains(col.FieldName, "ID")
+	}
+	return false
+}
+
+func IsNumericType(t reflect.Type) bool {
+	switch t.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64,
+		reflect.Complex64, reflect.Complex128:
+		return true
+	}
+	return false
 }
 
 func (g *GoLanguage) Tag(table *schemas.Table, col *schemas.Column) template.HTML {

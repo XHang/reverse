@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"xorm.io/reverse/name"
+	a "xorm.io/reverse/names"
 	"xorm.io/xorm/names"
 )
 
@@ -12,7 +12,7 @@ func GetMapperByName(mapname string) names.Mapper {
 	case "same":
 		return names.SameMapper{}
 	case "go":
-		return name.Go{}
+		return a.Go{}
 	default:
 		return names.SnakeMapper{}
 	}

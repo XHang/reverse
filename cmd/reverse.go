@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	schemas2 "xorm.io/reverse/schemas"
 
 	"xorm.io/reverse/pkg/conf"
 	"xorm.io/reverse/pkg/language"
@@ -174,6 +175,13 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 	if err != nil {
 		return err
 	}
+	customTables := make([]*schemas2.Table, 0, len(tables))
+	for _, t := range tables {
+		customTables = append(customTables, &schemas2.Table{
+			Table:    *t,
+			DataBase: ExtractDBName(source.ConnStr),
+		})
+	}
 
 	var w *os.File
 	if !target.MultipleFiles {
@@ -187,7 +195,7 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 
 		newbytes := bytes.NewBufferString("")
 		err = tmpl.Execute(newbytes, map[string]interface{}{
-			"Tables":  tables,
+			"Tables":  customTables,
 			"Imports": imports,
 		})
 		if err != nil {
@@ -225,7 +233,7 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 
 			newbytes := bytes.NewBufferString("")
 			err = tmpl.Execute(newbytes, map[string]interface{}{
-				"Tables":  tbs,
+				"Tables":  customTables,
 				"Imports": imports,
 			})
 			if err != nil {
@@ -253,4 +261,22 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 	}
 
 	return nil
+}
+
+func ExtractDBName(dsn string) string {
+	// 找到第一个 "/" 的位置
+	start := strings.Index(dsn, "/")
+	if start == -1 {
+		return ""
+	}
+
+	// 从 "/" 后面开始找 "?"
+	end := strings.Index(dsn[start+1:], "?")
+	if end == -1 {
+		// 没有 ?，说明数据库名到结尾
+		return dsn[start+1:]
+	}
+
+	// 返回 "/" 和 "?" 之间的内容
+	return dsn[start+1 : start+1+end]
 }
