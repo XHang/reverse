@@ -232,12 +232,16 @@ func (g *GoLanguage) Tag(table *schemas.Table, col *schemas.Column) template.HTM
 		nstr += ")"
 	}
 	res = append(res, nstr)
+	json := strings.ToLower(col.Name[:1]) + col.Name[1:]
+	if g.IsBigInt(col) {
+		json += ",string"
+	}
 	if len(res) > 0 {
 		if g.target.ColumnName {
-			return template.HTML(fmt.Sprintf(`xorm:"'%s' %s"`, col.Name, strings.Join(res, " ")))
+			return template.HTML(fmt.Sprintf(`json:"%s" xorm:"'%s' %s"`, json, col.Name, strings.Join(res, " ")))
 		}
 
-		return template.HTML(fmt.Sprintf(`xorm:"%s"`, strings.Join(res, " ")))
+		return template.HTML(fmt.Sprintf(`json:"%s" xorm:"%s"`, json, strings.Join(res, " ")))
 	}
 	return ""
 }
