@@ -59,19 +59,20 @@ type ReverseSource struct {
 
 // ReverseTarget represents a reverse target
 type ReverseTarget struct {
-	Type          string   `yaml:"type"`
-	IncludeTables []string `yaml:"include_tables"`
-	ExcludeTables []string `yaml:"exclude_tables"`
-	TableMapper   string   `yaml:"table_mapper"`
-	ColumnMapper  string   `yaml:"column_mapper"`
-	TemplatePath  string   `yaml:"template_path"`
-	Template      string   `yaml:"template"`
-	MultipleFiles bool     `yaml:"multiple_files"`
-	OutputDir     string   `yaml:"output_dir"`
-	TablePrefix   string   `yaml:"table_prefix"`
-	Language      string   `yaml:"language"`
-	TableName     bool     `yaml:"table_name"`
-	ColumnName    bool     `yaml:"column_name"`
+	Type              string   `yaml:"type"`
+	IncludeTables     []string `yaml:"include_tables"`
+	ExcludeTables     []string `yaml:"exclude_tables"`
+	BigintIDException []string `yaml:"bigintIDException"`
+	TableMapper       string   `yaml:"table_mapper"`
+	ColumnMapper      string   `yaml:"column_mapper"`
+	TemplatePath      string   `yaml:"template_path"`
+	Template          string   `yaml:"template"`
+	MultipleFiles     bool     `yaml:"multiple_files"`
+	OutputDir         string   `yaml:"output_dir"`
+	TablePrefix       string   `yaml:"table_prefix"`
+	Language          string   `yaml:"language"`
+	TableName         bool     `yaml:"table_name"`
+	ColumnName        bool     `yaml:"column_name"`
 
 	Funcs     map[string]string `yaml:"funcs"`
 	Formatter string            `yaml:"formatter"`

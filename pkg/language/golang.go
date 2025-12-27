@@ -119,6 +119,11 @@ func (g *GoLanguage) TypeString(col *schemas.Column) string {
 	return s
 }
 func (g *GoLanguage) IsBigInt(col *schemas.Column) bool {
+	for _, v := range g.target.BigintIDException {
+		if v == col.Name {
+			return false
+		}
+	}
 	st := col.SQLType
 	t := schemas.SQLType2Type(st)
 	if IsNumericType(t) {
