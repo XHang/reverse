@@ -11,6 +11,7 @@ targets:
   exclude_tables:
     -
   table_mapper: snake
+  column_name: true
   column_mapper: snake
   table_prefix: ""
   multiple_files: true

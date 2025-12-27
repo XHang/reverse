@@ -244,7 +244,7 @@ func (g *GoLanguage) Tag(table *schemas.Table, col *schemas.Column) template.HTM
 	}
 	if len(res) > 0 {
 		if g.target.ColumnName {
-			return template.HTML(fmt.Sprintf(`json:"%s" xorm:"'%s' %s"`, json, col.Name, strings.Join(res, " ")))
+			return template.HTML(fmt.Sprintf(`json:"%s" xorm:"%s '%s'"`, json, strings.Join(res, " "), col.Name))
 		}
 
 		return template.HTML(fmt.Sprintf(`json:"%s" xorm:"%s"`, json, strings.Join(res, " ")))
