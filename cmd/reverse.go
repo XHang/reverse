@@ -12,11 +12,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	schemas2 "xorm.io/reverse/schemas"
-
+	"xorm.io/reverse/meta"
 	"xorm.io/reverse/pkg/conf"
 	"xorm.io/reverse/pkg/language"
 	"xorm.io/reverse/pkg/utils"
+	schemas2 "xorm.io/reverse/schemas"
 
 	"gitea.com/lunny/log"
 	underscore "github.com/ahl5esoft/golang-underscore"
@@ -96,14 +96,22 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 		return err
 	}
 
-	tables, err := orm.DBMetas()
-	if err != nil {
-		return err
+	//there's a bug in xorm that it doesn't support UNSIGNED.
+	//location: xorm.io\xorm@v1.3.11\dialects\mysql.go:GetColumns
+	var tables []*schemas.Table
+	if orm.Dialect().URI().DBType == schemas.MYSQL {
+		tables, err = meta.NewLoader(orm.DB().DB, orm.Dialect().URI().DBName, target.IncludeTables...).Load()
+		if err != nil {
+			return err
+		}
+	} else {
+		tables, err = orm.DBMetas()
+		if err != nil {
+			return err
+		}
+		// filter tables according includes and excludes
+		tables = filterTables(tables, target)
 	}
-
-	// filter tables according includes and excludes
-	tables = filterTables(tables, target)
-
 	// load configuration from language
 	lang := language.GetLanguage(target.Language, target.TableName)
 
