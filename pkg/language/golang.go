@@ -237,11 +237,14 @@ func (g *GoLanguage) Tag(table *schemas.Table, col *schemas.Column) template.HTM
 		nstr += strings.TrimLeft(opts, ",")
 		nstr += ")"
 	}
+	// ... existing code ...
 	res = append(res, nstr)
-	json := strings.ToLower(col.Name[:1]) + col.Name[1:]
+	json := toCamelCase(col.Name)
 	if g.IsBigInt(col) {
 		json += ",string"
 	}
+	// ... existing code ...
+
 	if len(res) > 0 {
 		if g.target.ColumnName {
 			return template.HTML(fmt.Sprintf(`json:"%s" xorm:"%s '%s'"`, json, strings.Join(res, " "), col.Name))
@@ -250,6 +253,29 @@ func (g *GoLanguage) Tag(table *schemas.Table, col *schemas.Column) template.HTM
 		return template.HTML(fmt.Sprintf(`json:"%s" xorm:"%s"`, json, strings.Join(res, " ")))
 	}
 	return ""
+}
+
+func toCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	parts := strings.Split(s, "_")
+	if len(parts) == 1 {
+		return strings.ToLower(s)
+	}
+
+	result := strings.ToLower(parts[0])
+	for _, part := range parts[1:] {
+		if part != "" {
+			partConverted := strings.ToUpper(part[:1]) + strings.ToLower(part[1:])
+			if partConverted == "Id" {
+				partConverted = "ID"
+			}
+			result += partConverted
+		}
+	}
+	return result
 }
 
 func (g *GoLanguage) FormatGo(src string) (string, error) {
