@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -228,9 +229,9 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 		w.WriteString(source)
 		w.Close()
 	} else {
-		for _, table := range tables {
+		for _, table := range customTables {
 			// imports
-			tbs := []*schemas.Table{table}
+			tbs := []*schemas.Table{&table.Table}
 			imports := importter(tbs)
 
 			w, err := os.Create(filepath.Join(target.OutputDir, table.Name+target.ExtName))
@@ -241,14 +242,14 @@ func runReverse(source *conf.ReverseSource, target *conf.ReverseTarget) error {
 
 			newbytes := bytes.NewBufferString("")
 			err = tmpl.Execute(newbytes, map[string]interface{}{
-				"Tables":  customTables,
+				"Tables":  []*schemas2.Table{table},
 				"Imports": imports,
 			})
 			if err != nil {
 				return err
 			}
 
-			tplcontent, err := ioutil.ReadAll(newbytes)
+			tplcontent, err := io.ReadAll(newbytes)
 			if err != nil {
 				return err
 			}
