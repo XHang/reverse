@@ -79,7 +79,8 @@ func (m *Loader) loadColumns(t *schemas.Table) ([]*schemas.Column, error) {
             is_nullable,
             column_key,
             extra,
-            column_default
+            column_default,
+            column_comment
         FROM information_schema.columns
         WHERE table_schema = ?
           AND table_name = ?
@@ -98,9 +99,10 @@ func (m *Loader) loadColumns(t *schemas.Table) ([]*schemas.Column, error) {
 		var (
 			name, colType, nullable, key, extra string
 			defaultVal                          sql.NullString
+			comment                             sql.NullString
 		)
 
-		rows.Scan(&name, &colType, &nullable, &key, &extra, &defaultVal)
+		rows.Scan(&name, &colType, &nullable, &key, &extra, &defaultVal, &comment)
 
 		col := &schemas.Column{
 			Name:            name,
@@ -108,6 +110,7 @@ func (m *Loader) loadColumns(t *schemas.Table) ([]*schemas.Column, error) {
 			Nullable:        nullable == "YES",
 			IsPrimaryKey:    key == "PRI",
 			IsAutoIncrement: strings.Contains(extra, "auto_increment"),
+			Comment:         comment.String,
 		}
 
 		// ⭐ 关键：增强版类型解析（替代 xorm 的 ParseString）
